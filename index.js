@@ -19,12 +19,22 @@ var noise = x => {
 var player = new function(){
     this.x = c.width / 2;
     this.y = 0;
+    this.ySpeed = 0;
     this.rot = 0;
 
     this.img = new Image();
     this.img.src = "foodpandaRider.png";
     this.draw = function(){
-        ctx.drawImage(this.img, this.x, 100);
+        var p1 = c.height - noise(t + this.x) * 0.25;
+        if(p1 > this.y){
+            this.ySpeed -= 0.1;
+        }
+        this.y -= this.ySpeed;
+
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.drawImage(this.img, 0, 0, this.img.width/25, this.img.height/25);
+        ctx.restore();
     }
 }
 
