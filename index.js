@@ -26,10 +26,10 @@ var player = new function(){
     this.img.src = "foodpandaRider.png";
     this.draw = function(){
         var p1 = c.height - noise(t + this.x) * 0.25;
-        if(p1 - 50 > this.y){
+        if(p1 - 45 > this.y){
             this.ySpeed -= 0.1;
         }else{
-            this.y = p1 - 50;
+            this.y = p1 - 45;
             this.ySpeed = 0;
         }
         this.y -= this.ySpeed;
@@ -43,7 +43,7 @@ var player = new function(){
 
 var t = 0;
 function loop(){
-    t += 1;
+    t += 5; //motorcycle speed
     ctx.fillStyle = "#19f";
     ctx.fillRect(0, 0, c.width, c.height);
 
