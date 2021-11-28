@@ -21,29 +21,58 @@ var player = new function(){
     this.y = 0;
     this.ySpeed = 0;
     this.rot = 0;
+    this.rSpeed = 0;
 
     this.img = new Image();
     this.img.src = "foodpandaRider.png";
     this.draw = function(){
         var p1 = c.height - noise(t + this.x) * 0.25;
-        if(p1 - 45 > this.y){
-            this.ySpeed -= 0.1;
-        }else{
-            this.y = p1 - 45;
-            this.ySpeed = 0;
-        }
-        this.y -= this.ySpeed;
+        var p2 = c.height - noise(t + 15 + this.x) * 0.25;
 
+        var grounded = 0;
+        if(p1 - 45 > this.y){
+            this.ySpeed += 0.1;
+            grounded = 0;
+        }else{            
+            this.ySpeed -= this.y - (p1 - 45);
+            this.y = p1 - 45;
+            grounded = 1;
+        }
+
+        if(!playing || grounded && Math.abs(this.rot) > Math.PI * 0.5){
+            playing = false;
+            this.rSpeed = 5;
+            k.ArrowUp = 1;
+            this.x -= speed * 5;
+        }
+        
+        var angle = Math.atan2((p2 -45) - this.y, (this.x +15) - this.x);
+        this.y += this.ySpeed;
+
+        if(grounded && playing){
+            this.rot -= (this.rot - angle) * 0.5;
+            this.rSpeed = this.rSpeed - (angle - this.rot);
+        }
+        this.rSpeed += (k.ArrowLeft - k.ArrowRight) * 0.05;
+        this.rot -= this.rSpeed * 0.1;
+        if(this.rot > Math.PI) this.rot = -Math.PI;
+        if(this.rot < - Math.PI) this.rot = Math.PI;
         ctx.save();
         ctx.translate(this.x, this.y);
+        ctx.rotate(this.rot);
         ctx.drawImage(this.img, 0, 0, this.img.width/35, this.img.height/35);
         ctx.restore();
     }
 }
 
 var t = 0;
+var speed = 0;
+var k = {ArrowUp :0, ArrowDown :0, ArrowLeft :0, ArrowRight :0};
+var playing = true;
 function loop(){
-    t += 5; //motorcycle speed
+    speed += (speed - (k.ArrowUp - k.ArrowDown)) * 0.01;
+    
+    t += 1 * speed; //motorcycle speed
     ctx.fillStyle = "#19f";
     ctx.fillRect(0, 0, c.width, c.height);
 
@@ -59,5 +88,8 @@ function loop(){
     player.draw();
     requestAnimationFrame(loop);
 }
+
+onkeydown = d => k[d.key] = 1;
+onkeyup = d => k[d.key] = 0;
 
 loop();
